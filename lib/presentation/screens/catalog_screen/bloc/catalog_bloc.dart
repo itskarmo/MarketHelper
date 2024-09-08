@@ -29,11 +29,13 @@ class CatalogBloc extends Bloc<CatalogEvent, CatalogState> {
                 toolsItems: [toolsItem]),
       );
     } catch (e) {
+      /// todo print errors
       print('Error $e');
       emit(state.copyWith(status: CatalogStatus.failure));
     }
   }
 
   Future<void> _newCatalogSearch(
-      NewCatalogSearch event, Emitter<CatalogState> emit) async {}
+          NewCatalogSearch event, Emitter<CatalogState> emit) async =>
+      emit(state.copyWith(searchID: event.newCatalogSearch));
 }
