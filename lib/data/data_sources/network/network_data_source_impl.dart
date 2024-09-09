@@ -76,7 +76,6 @@ class NetworkDataSourceImpl implements NetworkDataSource {
           .attributes
           .values
           .elementAt(1);
-      print(itemImage);
       return ToolsItem(
         id: id,
         name: itemName,

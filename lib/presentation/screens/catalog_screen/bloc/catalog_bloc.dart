@@ -1,7 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:market_helper/domain/repository/products_data_repository.dart';
 import 'package:market_helper/presentation/screens/catalog_screen/bloc/catalog_state.dart';
-
 import 'catalog_event.dart';
 
 class CatalogBloc extends Bloc<CatalogEvent, CatalogState> {
@@ -15,23 +14,23 @@ class CatalogBloc extends Bloc<CatalogEvent, CatalogState> {
   Future<void> _onCatalogFetched(
       CatalogFetched event, Emitter<CatalogState> emit) async {
     try {
+      emit(state.copyWith(status: CatalogStatus.inProgress));
       final toolsItem =
           await productsDataRepository.getProductByIdToolsBy(state.searchID);
-      print(toolsItem.value);
       final dealItems =
           await productsDataRepository.getProductsByIdDealBy(state.searchID);
+      if (dealItems.isEmpty) throw Exception(['No Deal data found']);
+      if (toolsItem.name == '') throw Exception(['No Tools data found']);
       emit(
-        dealItems.isEmpty
-            ? state.copyWith(status: CatalogStatus.failure)
-            : state.copyWith(
-                status: CatalogStatus.success,
-                dealItems: dealItems,
-                toolsItems: [toolsItem]),
+        state.copyWith(
+          status: CatalogStatus.success,
+          dealItems: dealItems,
+          toolsItems: [toolsItem],
+        ),
       );
     } catch (e) {
-      /// todo print errors
-      print('Error $e');
-      emit(state.copyWith(status: CatalogStatus.failure));
+      print(e);
+      emit(state.copyWith(status: CatalogStatus.failure, userMessage: e.toString()));
     }
   }
 

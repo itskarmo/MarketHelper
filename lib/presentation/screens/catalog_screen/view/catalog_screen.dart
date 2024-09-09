@@ -23,59 +23,85 @@ class CatalogScreen extends StatelessWidget {
       child: Scaffold(
         body: BlocBuilder<CatalogBloc, CatalogState>(
           builder: (context, state) {
-            switch (state.status) {
-              case CatalogStatus.failure:
-                //return const Center(child: Text('failed to fetch posts'));
-              case CatalogStatus.success:
-                if (state.dealItems.isEmpty && state.toolsItems.isEmpty) {
-                  return const Center(child: Text('no posts'));
-                }
-                return Column(
+            return Column(
+              children: [
+                const SizedBox(height: 10,),
+                Row(
                   children: [
-                    TextField(
-                      decoration: const InputDecoration(labelText: 'Search'),
-                      onChanged: (searchText) => context
-                          .read<CatalogBloc>()
-                          ..add(NewCatalogSearch(newCatalogSearch: searchText),)
-                          ..add(CatalogFetched()),
-                    ),
-                    ListTile(
-                      leading: Image.network(state.toolsItems.first.image ??
-                          'https://static.vecteezy.com/system/resources/thumbnails/022/014/063/small_2x/missing-picture-page-for-website-design-or-mobile-app-design-no-image-available-icon-vector.jpg'),
-                      title: Text(
-                        state.toolsItems.first.name,
-                        //style: const TextStyle(fontSize: 30),
-                      ),
-                      subtitle: Text(
-                        state.toolsItems.first.value.toString(),
-                        //style: const TextStyle(fontSize: 30),
-                      ),
-                    ),
+                    const Center(child: Icon(Icons.search, size: 30)),
                     Expanded(
-                      child: ListView.builder(
-                        itemCount: state.dealItems.length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            leading: Image.network(state
-                                    .dealItems[index].image ??
-                                'https://static.vecteezy.com/system/resources/thumbnails/022/014/063/small_2x/missing-picture-page-for-website-design-or-mobile-app-design-no-image-available-icon-vector.jpg'),
-                            title: Text(
-                              state.dealItems[index].name,
-                              //style: const TextStyle(fontSize: 30),
-                            ),
-                            subtitle: Text(
-                              state.dealItems[index].value.toString(),
-                              //style: const TextStyle(fontSize: 30),
-                            ),
-                          );
-                        },
+                      child: TextField(
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: 'Enter a search term',
+                        ),
+                        onSubmitted: (searchText) => context.read<CatalogBloc>()
+                          ..add(NewCatalogSearch(newCatalogSearch: searchText))
+                          ..add(CatalogFetched()),
                       ),
                     ),
                   ],
-                );
-              case CatalogStatus.initial:
-                return const Center(child: CircularProgressIndicator());
-            }
+                ),
+                Expanded(
+                  child: switch (state.status) {
+                    CatalogStatus.initial => Center(
+                        child: Text(state.userMessage),
+                      ),
+                    CatalogStatus.success => Column(
+                        children: [
+                          ListTile(
+                            leading: AspectRatio(
+                              aspectRatio: 1.5,
+                              child: Image.network(
+                                state.toolsItems.first.image ??
+                                    'https://static.vecteezy.com/system/resources/thumbnails/022/014/063/small_2x/missing-picture-page-for-website-design-or-mobile-app-design-no-image-available-icon-vector.jpg',
+                              ),
+                            ),
+                            title: SelectableText(
+                              state.toolsItems.first.name,
+                              //style: const TextStyle(fontSize: 30),
+                            ),
+                            subtitle: SelectableText(
+                              state.toolsItems.first.value.toString(),
+                              //style: const TextStyle(fontSize: 30),
+                            ),
+                          ),
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: state.dealItems.length,
+                              itemBuilder: (context, index) {
+                                return ListTile(
+                                  leading: AspectRatio(
+                                    aspectRatio: 1.5,
+                                    child: Image.network(
+                                      state.dealItems[index].image ??
+                                          'https://static.vecteezy.com/system/resources/thumbnails/022/014/063/small_2x/missing-picture-page-for-website-design-or-mobile-app-design-no-image-available-icon-vector.jpg',
+                                    ),
+                                  ),
+                                  title: SelectableText(
+                                    state.dealItems[index].name,
+                                    //style: const TextStyle(fontSize: 30),
+                                  ),
+                                  subtitle: SelectableText(
+                                    state.dealItems[index].value.toString(),
+                                    //style: const TextStyle(fontSize: 30),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    CatalogStatus.failure => Center(
+                        child: Text(state.userMessage),
+                      ),
+                    CatalogStatus.inProgress => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                  },
+                ),
+              ],
+            );
           },
         ),
       ),
