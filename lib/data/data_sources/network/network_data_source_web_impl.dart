@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:js_interop';
 import 'package:market_helper/data/data_sources/network/interface/network_data_source.dart';
 import 'package:http/http.dart' as http;
+import 'package:market_helper/domain/entities/filter/catalog_filter.dart';
 import 'package:market_helper/domain/entities/markets_items/deal_item.dart';
 import 'package:market_helper/domain/entities/markets_items/tools_item.dart';
 import 'package:market_helper/global_variables.dart';
@@ -114,7 +115,7 @@ class NetworkDataSourceImpl implements NetworkDataSource {
   }
 
   @override
-  Future<List<DealItem>> getProductsByIdDealBy(String id) async {
+  Future<List<DealItem>> getProductsByIdDealBy(String id, CatalogFilter? filter) async {
     final dealUri = Uri.parse('$urlDealBy/search?search_term=$id&sort=price');
     final result = await http.get(dealUri);
     var document = web.Document.parseHTMLUnsafe(result.body.jsify()!);

@@ -9,18 +9,28 @@ class CatalogBloc extends Bloc<CatalogEvent, CatalogState> {
   CatalogBloc(this.productsDataRepository) : super(const CatalogState()) {
     on<CatalogFetched>(_onCatalogFetched);
     on<NewCatalogSearch>(_newCatalogSearch);
+    on<CatalogFilterPriceFromChange>(_catalogFilterPriceFromChange);
   }
 
-  Future<void> _onCatalogFetched(
-      CatalogFetched event, Emitter<CatalogState> emit) async {
+  Future<void> _onCatalogFetched(CatalogFetched event,
+      Emitter<CatalogState> emit) async {
     try {
       emit(state.copyWith(status: CatalogStatus.inProgress));
       final toolsItem =
-          await productsDataRepository.getProductByIdToolsBy(state.searchID);
-      final dealItems =
-          await productsDataRepository.getProductsByIdDealBy(state.searchID);
+      await productsDataRepository.getProductByIdToolsBy(state.searchID);
+      emit(
+        state.copyWith(
+          catalogFilter: state.catalogFilter.copyWith(
+            priceFrom: toolsItem.value,
+          ),
+        ),
+      );
+      if (toolsItem.value.isNaN) throw Exception(['No Tools data found']);
+      final dealItems = await productsDataRepository.getProductsByIdDealBy(
+        state.searchID,
+        state.catalogFilter,
+      );
       if (dealItems.isEmpty) throw Exception(['No Deal data found']);
-      if (toolsItem.name == '') throw Exception(['No Tools data found']);
       emit(
         state.copyWith(
           status: CatalogStatus.success,
@@ -30,11 +40,17 @@ class CatalogBloc extends Bloc<CatalogEvent, CatalogState> {
       );
     } catch (e) {
       print(e);
-      emit(state.copyWith(status: CatalogStatus.failure, userMessage: e.toString()));
+      emit(state.copyWith(
+          status: CatalogStatus.failure, userMessage: e.toString()));
     }
   }
 
-  Future<void> _newCatalogSearch(
-          NewCatalogSearch event, Emitter<CatalogState> emit) async =>
+  Future<void> _newCatalogSearch(NewCatalogSearch event,
+      Emitter<CatalogState> emit) async =>
       emit(state.copyWith(searchID: event.newCatalogSearch));
+
+  Future<void> _catalogFilterPriceFromChange(CatalogFilterPriceFromChange event,
+      Emitter<CatalogState> emit) async =>
+      emit(state.copyWith(catalogFilter: state.catalogFilter.copyWith(
+          priceFrom: double.parse(event.priceFrom))));
 }

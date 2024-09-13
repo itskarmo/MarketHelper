@@ -8,8 +8,13 @@ void main() async {
   //     await i<ProductsDataRepository>().getProductByIdDealBy('AE-50-OF1');
   final toolsPrice =
       await i<ProductsDataRepository>().getProductByIdToolsBy('AE-50-OF1');
-  final dealPrices = await i<ProductsDataRepository>().getProductsByIdDealBy('AE-50-OF1');
-  dealPrices.forEach((element) {print(element.value);});
+  final dealPrices = await i<ProductsDataRepository>().getProductsByIdDealBy(
+    'AE-50-OF1',
+    null,
+  );
+  dealPrices.forEach((element) {
+    print(element.value);
+  });
   print('tools price ${toolsPrice.value}');
   // print(marketItem.name);
   // print(marketItem.value);

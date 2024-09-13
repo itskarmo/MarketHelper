@@ -10,6 +10,11 @@ sealed class CatalogEvent extends Equatable {
 final class CatalogFetched extends CatalogEvent {}
 
 final class NewCatalogSearch extends CatalogEvent {
-  const NewCatalogSearch({required this.newCatalogSearch});
   final String newCatalogSearch;
+  const NewCatalogSearch({required this.newCatalogSearch});
+}
+
+final class CatalogFilterPriceFromChange extends CatalogEvent {
+  final String priceFrom;
+  const CatalogFilterPriceFromChange(this.priceFrom);
 }

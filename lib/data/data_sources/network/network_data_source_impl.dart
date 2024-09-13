@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:market_helper/data/data_sources/network/interface/network_data_source.dart';
 import 'package:http/http.dart' as http;
+import 'package:market_helper/domain/entities/filter/catalog_filter.dart';
 import 'package:market_helper/domain/entities/markets_items/deal_item.dart';
 import 'package:market_helper/domain/entities/markets_items/tools_item.dart';
 import 'package:html/parser.dart';
@@ -80,7 +81,6 @@ class NetworkDataSourceImpl implements NetworkDataSource {
         id: id,
         name: itemName,
         image: itemImage,
-        // TODO use tryParse in future
         value: double.parse(itemPrice.replaceFirst(',', '.')),
       );
     } catch (e) {
@@ -89,8 +89,13 @@ class NetworkDataSourceImpl implements NetworkDataSource {
   }
 
   @override
-  Future<List<DealItem>> getProductsByIdDealBy(String id) async {
-    final dealUri = Uri.parse('$urlDealBy/search?search_term=$id&sort=price');
+  Future<List<DealItem>> getProductsByIdDealBy(
+    String id,
+    CatalogFilter? filter,
+  ) async {
+    String priceFrom = '';
+    if (filter != null)  priceFrom = '&price_local__gte=${filter.priceFrom}';
+    final dealUri = Uri.parse('$urlDealBy/search?search_term=$id&sort=price$priceFrom');
     final result = await http.get(dealUri);
     var document = parse(result.body);
     final classElements = document

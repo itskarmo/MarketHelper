@@ -25,7 +25,9 @@ class CatalogScreen extends StatelessWidget {
           builder: (context, state) {
             return Column(
               children: [
-                const SizedBox(height: 10,),
+                const SizedBox(
+                  height: 10,
+                ),
                 Row(
                   children: [
                     const Center(child: Icon(Icons.search, size: 30)),
@@ -38,6 +40,26 @@ class CatalogScreen extends StatelessWidget {
                         onSubmitted: (searchText) => context.read<CatalogBloc>()
                           ..add(NewCatalogSearch(newCatalogSearch: searchText))
                           ..add(CatalogFetched()),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    const SizedBox(width: 10),
+                    const Text('Price from'),
+                    const SizedBox(width: 20),
+                    SizedBox(
+                      width: 80,
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: state.catalogFilter.priceFrom.toString(),
+                        ),
+                        onSubmitted: (priceFromText) {
+                          context.read<CatalogBloc>()
+                            ..add(CatalogFilterPriceFromChange(priceFromText))
+                            ..add(CatalogFetched());
+                        },
                       ),
                     ),
                   ],
