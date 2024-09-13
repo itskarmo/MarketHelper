@@ -30,6 +30,7 @@ class CatalogBloc extends Bloc<CatalogEvent, CatalogState> {
         state.searchID,
         state.catalogFilter,
       );
+      dealItems.sort((a, b) => a.value.compareTo(b.value));
       if (dealItems.isEmpty) throw Exception(['No Deal data found']);
       emit(
         state.copyWith(
@@ -38,8 +39,11 @@ class CatalogBloc extends Bloc<CatalogEvent, CatalogState> {
           toolsItems: [toolsItem],
         ),
       );
-    } catch (e) {
-      print(e);
+    } on RangeError catch (e) {
+      print('Range Error $e');
+    }
+    catch (e) {
+      print(e.runtimeType);
       emit(state.copyWith(
           status: CatalogStatus.failure, userMessage: e.toString()));
     }
