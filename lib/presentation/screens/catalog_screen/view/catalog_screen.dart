@@ -5,6 +5,7 @@ import 'package:market_helper/presentation/di/injector.dart';
 import 'package:market_helper/presentation/screens/catalog_screen/bloc/catalog_bloc.dart';
 import 'package:market_helper/presentation/screens/catalog_screen/bloc/catalog_event.dart';
 import 'package:market_helper/presentation/screens/catalog_screen/bloc/catalog_state.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CatalogScreen extends StatelessWidget {
   const CatalogScreen({super.key});
@@ -62,6 +63,13 @@ class CatalogScreen extends StatelessWidget {
                         },
                       ),
                     ),
+                    const Spacer(),
+                    Container(
+                      margin: const EdgeInsets.only(right: 10),
+                      child: Text(
+                        'Items found: ${state.dealItems.length.toString()}',
+                      ),
+                    ),
                   ],
                 ),
                 Expanded(
@@ -95,9 +103,16 @@ class CatalogScreen extends StatelessWidget {
                                 return ListTile(
                                   leading: AspectRatio(
                                     aspectRatio: 1.5,
-                                    child: Image.network(
-                                      state.dealItems[index].image ??
-                                          'https://static.vecteezy.com/system/resources/thumbnails/022/014/063/small_2x/missing-picture-page-for-website-design-or-mobile-app-design-no-image-available-icon-vector.jpg',
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        print('launch : ${state.dealItems[index].link}');
+                                        launchUrl(Uri.parse(
+                                            state.dealItems[index].link));
+                                      },
+                                      child: Image.network(
+                                        state.dealItems[index].image ??
+                                            'https://static.vecteezy.com/system/resources/thumbnails/022/014/063/small_2x/missing-picture-page-for-website-design-or-mobile-app-design-no-image-available-icon-vector.jpg',
+                                      ),
                                     ),
                                   ),
                                   title: SelectableText(
@@ -105,7 +120,7 @@ class CatalogScreen extends StatelessWidget {
                                     //style: const TextStyle(fontSize: 30),
                                   ),
                                   subtitle: SelectableText(
-                                    state.dealItems[index].value.toString(),
+                                    '${state.dealItems[index].value.toString()}    ${state.dealItems[index].companyName}   ${state.dealItems[index].regionName}',
                                     //style: const TextStyle(fontSize: 30),
                                   ),
                                 );

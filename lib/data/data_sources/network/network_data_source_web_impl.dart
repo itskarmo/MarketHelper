@@ -106,6 +106,8 @@ class NetworkDataSourceImpl implements NetworkDataSource {
       print(double.parse(coins.replaceFirst(',', '.')));
       return DealItem(
         name: id,
+        companyName: id,
+        regionName: id,
         image: 'image',
         // TODO use tryParse in future
         value: double.parse(coins.replaceFirst(',', '.')),
@@ -132,6 +134,8 @@ class NetworkDataSourceImpl implements NetworkDataSource {
           dealItems.add(
             DealItem(
               name: json[i]['product']['nameForCatalog'],
+              companyName: json[i]['product']['nameForCatalog'],
+              regionName: json[i]['product']['nameForCatalog'],
               image: json[i]['product']['image({"height":200,"width":200})'],
               value: double.parse(
                 json[i]['product']['hasDiscount'] == true

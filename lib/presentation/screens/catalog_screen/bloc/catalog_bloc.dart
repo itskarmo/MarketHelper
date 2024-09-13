@@ -18,13 +18,15 @@ class CatalogBloc extends Bloc<CatalogEvent, CatalogState> {
       emit(state.copyWith(status: CatalogStatus.inProgress));
       final toolsItem =
       await productsDataRepository.getProductByIdToolsBy(state.searchID);
-      emit(
-        state.copyWith(
-          catalogFilter: state.catalogFilter.copyWith(
-            priceFrom: toolsItem.value,
+      if(state.catalogFilter.priceFrom == 0.0){
+        emit(
+          state.copyWith(
+            catalogFilter: state.catalogFilter.copyWith(
+              priceFrom: toolsItem.value,
+            ),
           ),
-        ),
-      );
+        );
+      }
       if (toolsItem.value.isNaN) throw Exception(['No Tools data found']);
       final dealItems = await productsDataRepository.getProductsByIdDealBy(
         state.searchID,
@@ -51,7 +53,7 @@ class CatalogBloc extends Bloc<CatalogEvent, CatalogState> {
 
   Future<void> _newCatalogSearch(NewCatalogSearch event,
       Emitter<CatalogState> emit) async =>
-      emit(state.copyWith(searchID: event.newCatalogSearch));
+      emit(state.copyWith(searchID: event.newCatalogSearch, catalogFilter: state.catalogFilter.copyWith(priceFrom: 0.0)));
 
   Future<void> _catalogFilterPriceFromChange(CatalogFilterPriceFromChange event,
       Emitter<CatalogState> emit) async =>

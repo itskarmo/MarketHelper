@@ -48,7 +48,7 @@ class NetworkDataSourceImpl implements NetworkDataSource {
     final result = await http.get(toolsUri);
     try {
       final document = parse(result.body);
-      final route = document
+      String route = document
           .getElementsByClassName("div_naimen no_border")
           .first
           .getElementsByTagName("a")
@@ -56,6 +56,16 @@ class NetworkDataSourceImpl implements NetworkDataSource {
           .attributes
           .values
           .first;
+      if (route.contains('//tools.by')) {
+        route = document
+            .getElementsByClassName("div_naimen no_border")
+            .first
+            .getElementsByTagName("a")[1]
+            .attributes
+            .values
+            .first;
+      }
+      print(route);
       final itemWebPageRes = await http.get(
         Uri.parse('$urlToolsBy$route'),
         headers: <String, String>{'Cookie': 'tr_rb=hide; $cookies'},
@@ -96,11 +106,13 @@ class NetworkDataSourceImpl implements NetworkDataSource {
     final dealItems = <DealItem>[];
     String priceFrom = '';
     if (filter != null) priceFrom = '&price_local__gte=${filter.priceFrom}';
+    final dealUri = Uri.parse('$urlDealBy/search?search_term=$id&sort=price');
+    final result = await http.get(dealUri);
     for (int i = 1; i <= 3; i++) {
       String page = '';
-      if(i != 1) page = '&page=$i';
-      final dealUri =
-          Uri.parse('$urlDealBy/search?search_term=$id&sort=price$priceFrom$page');
+      if (i != 1) page = '&page=$i';
+      final dealUri = Uri.parse(
+          '$urlDealBy/search?search_term=$id&sort=price$priceFrom$page');
       print(dealUri.toString());
       final result = await http.get(dealUri);
       var document = parse(result.body);
@@ -112,16 +124,23 @@ class NetworkDataSourceImpl implements NetworkDataSource {
       final jsonStart = classElements?.lastIndexOf('"products":[{');
       final jsonEnd = classElements?.lastIndexOf('"productsBadMatch":[],');
       print('$jsonStart, $jsonEnd');
-      if(jsonStart != -1 && jsonEnd != -1){
+      if (jsonStart != -1 && jsonEnd != -1) {
         final data = classElements?.substring(jsonStart! + 11, jsonEnd! - 1);
         if (data != null) {
           final json = jsonDecode(data) as List<dynamic>;
           for (int i = 0; i < json.length; i++) {
-            if ((json[i]['product']['nameForCatalog'] as String).contains(id)) {
+            final catalogName = json[i]['product']['nameForCatalog'] as String;
+            if (catalogName.contains(id.toUpperCase()) ||
+                catalogName.contains(id.toLowerCase()) ||
+                catalogName.contains(id)) {
               dealItems.add(
                 DealItem(
                   name: json[i]['product']['nameForCatalog'],
-                  image: json[i]['product']['image({"height":200,"width":200})'],
+                  companyName: json[i]['product']['company']['name'],
+                  regionName: json[i]['product']['company']['regionName'],
+                  link: json[i]['product']['urlForProductCatalog'],
+                  image: json[i]['product']
+                      ['image({"height":200,"width":200})'],
                   value: double.parse(
                     json[i]['product']['hasDiscount'] == true
                         ? json[i]['product']['discountedPrice']
