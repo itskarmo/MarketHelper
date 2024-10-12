@@ -4,9 +4,7 @@ import 'package:market_helper/data/data_sources/repositories/products_data_repos
 import 'package:market_helper/domain/repository/products_data_repository.dart';
 import 'package:market_helper/data/data_sources/network/network_data_source_impl.dart'
     if (dart.library.js) 'package:market_helper/data/data_sources/network/network_data_source_web_impl.dart';
-
-const String urlToolsBy = 'https://dom.tools.by';
-const String urlDealBy = 'https://deal.by';
+import 'package:market_helper/global_variables.dart';
 
 GetIt get i => GetIt.instance;
 

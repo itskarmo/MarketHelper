@@ -45,12 +45,15 @@ class NetworkDataSourceImpl implements NetworkDataSource {
   Future<ToolsItem> getProductByIdToolsBy(String id) async {
     final toolsUri = Uri.parse('$urlToolsBy/?q=kat&part=1&keys=$id');
     final cookies = await getSessionIdToolsBy();
-    final result = await http.get(toolsUri);
+    final result = await http.get(
+      toolsUri,
+      headers: <String, String>{'Cookie': 'tr_rb=hide; $cookies; mode_skd_prepay=show'},
+    );
     try {
       final document = parse(result.body);
       String route = document
           .getElementsByClassName("div_naimen no_border")
-          .first
+          .firstWhere((test) => test.innerHtml.contains('/?q=kat'))
           .getElementsByTagName("a")
           .first
           .attributes
@@ -68,7 +71,7 @@ class NetworkDataSourceImpl implements NetworkDataSource {
       print(route);
       final itemWebPageRes = await http.get(
         Uri.parse('$urlToolsBy$route'),
-        headers: <String, String>{'Cookie': 'tr_rb=hide; $cookies'},
+        headers: <String, String>{'Cookie': 'tr_rb=hide; $cookies; mode_skd_prepay=show'},
       );
       final webDocument = parse(itemWebPageRes.body);
       final itemPrice = webDocument
